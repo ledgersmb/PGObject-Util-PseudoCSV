@@ -4,6 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use PGObject;
+use Carp;
 
 =head1 NAME
 
@@ -76,7 +77,7 @@ so depth in SQL structures passed should be reasonably limited.
 
 use parent 'Exporter';
 
-@EXPORT = qw(pseudocsv_to_hash pseudocsv_parse);
+our @EXPORT = qw(pseudocsv_to_hash pseudocsv_parse);
 
 =head1 SUBROUTINES/METHODS
 
@@ -94,7 +95,7 @@ sub pseudocsv_parse {
     my @returnlist = ();
     while (my $val = _parse(\$csv)){
         my $in_type = $type;
-        $in_type = shift @$type if ref @type eq ref [];
+        $in_type = shift @$type if ref $type eq ref [];
         $val =~ s/""/"/g;
         push @returnlist, PGObject::process_type($val, $type, $registry);
     }
@@ -133,7 +134,7 @@ a hash.
 sub pseudocsv_tohash {
     my ($cols, $colnames) = @_;
     my $hash = {};
-    for my $col (@cols) {
+    for my $col (@$cols) {
         my $colname = shift @$colnames;
         last unless defined $colname;
         $hash->{$colname} = $col;
@@ -150,7 +151,7 @@ Takes a list of data and an is_tuple argument and creates a pseudocsv.
 
 sub to_pseudocsv {
     my ($list, $is_tuple) = @_;
-    croak 'First arg must be an arrayref' unless ref $list;
+    Carp::croak 'First arg must be an arrayref' unless ref $list;
     my $csv = "";
     for my $item (@$list){
         $csv .= ',' if $csv;
@@ -162,7 +163,7 @@ sub to_pseudocsv {
              next;
         }
         $item =~ s/"/""/;
-        $item = qq{"$item"} if $item =~ /(^null$|[",{})/;
+        $item = qq{"$item"} if $item =~ /(^null$|[",{}])/;
     }
     return qq|($csv)| if $is_tuple;
     return qq|{$csv}|;
