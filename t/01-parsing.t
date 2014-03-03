@@ -1,8 +1,17 @@
 use Test::More tests => 10;
+
 use PGObject::Util::PseudoCSV;
 
-my $proplist = ["test", '1', '3', undef, '44'];
-my $testval;
+# plain forms
+my $simpletuple = '(a,b,",")';
+my $simplearray = '{a,b,","}';
 
-ok ($testval = to_pseudocsv($proplist, 0), 'serialized successfully');
-is $testval, '{test,1,3,NULL,44}', 'correct value for array serialization');
+# nulls
+my $nulltuple = '(a,b,",",NULL)';
+my $nullarray = '{a,b,",",NULL}';
+
+# nested tests
+my $nestedtuple = '(a,b,",","(1,a)")';
+my $nestedarray = '{{a,b},{1,a}}';
+my $tuplewitharray = '(a,b,",","{1,a}")';
+my $arrayoftuples = '{"(a,b)","(1,a)"';
