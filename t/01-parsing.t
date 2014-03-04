@@ -1,4 +1,4 @@
-use Test::More tests => 10;
+use Test::More tests => 14;
 
 use PGObject::Util::PseudoCSV;
 
@@ -13,7 +13,7 @@ my $nullarray = '{a,b,",",NULL}';
 # nested tests
 my $nestedtuple = '(a,b,",","(1,a)")';
 my $nestedarray = '{{a,b},{1,a}}';
-my $tuplewitharray = '{a,b,",","{1,a}"}';
+my $tuplewitharray = '(a,b,",","{1,a}")';
 my $arrayoftuples = '{"(a,b)","(1,a)"}';
 
 # Newline tests
@@ -41,3 +41,12 @@ is_deeply($valarray, ['a', 'b', ',', undef], 'Parse correct, simple tuple');
 ok ($valarray = pseudocsv_parse($nullarray, 'test'), 
       'Parse success, simple array');
 is_deeply($valarray, ['a', 'b', ',', undef], 'Parse correct, simple array');
+
+# Nested tuple
+ok ($valarray = pseudocsv_parse($nestedtuple, 'test'),
+      'Parse success, nested tuple');
+is_deeply($valarray, ['a', 'b', ',', '(1,a)'], 'Parse correct, simple array');
+
+# Tuple with array
+
+# Array of tuples

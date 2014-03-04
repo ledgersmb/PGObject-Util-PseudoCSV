@@ -104,7 +104,6 @@ sub pseudocsv_parse {
         $in_type = shift @$type if ref $type eq ref [];
         $val =~ s/""/"/g if defined $val;
         push @returnlist, PGObject::process_type($val, $type, $registry);
-        warn $csv;
     }
     return @returnlist if wantarray;
     return \@returnlist;
@@ -116,15 +115,15 @@ sub _parse {
     my ($csvref) = @_;
     my $retval;
     if ($$csvref =~ /^"/){ # quoted string
-       warn "quoted string $$csvref";
-       $$csvref =~ s/^"(.*[^"](\"{2})*)"(,|$)//;
+       $$csvref =~ s/^"(([^"]|"")*)",?//;
        $retval = $1;
+       $retval =~ s/""/"/g;
     } else {
        $$csvref =~ s/^([^,]*)(,|$)//;
        $retval = $1;
        $retval = undef if $retval =~ /^null$/i;
     }
-    if ($retval =~ s/^\{(.*)\}$/$1/){
+    if (defined $retval and $retval =~ s/^\{(.*)\}$/$1/){
         my $listref = [];
         push @$listref, _parse(\$retval) while $retval;
         $retval = $listref;
