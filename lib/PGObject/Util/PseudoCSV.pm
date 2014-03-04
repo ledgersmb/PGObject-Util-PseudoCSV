@@ -91,6 +91,11 @@ subarray is parsed for more entities.
 
 sub pseudocsv_parse {
     my ($csv, $type, $registry) = @_;
+    if ($csv =~ /^\(/ ) { # tuple
+       $csv =~ s/^\((.*)\)$/$1/g;
+    } elsif ($csv =~ /^\{/ ) { # array 
+       $csv =~ s/^\{(.*)\}$/$1/g;
+    }
     $registry ||= 'default';
     my @returnlist = ();
     while (my $val = _parse(\$csv)){
