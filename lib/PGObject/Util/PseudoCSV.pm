@@ -12,11 +12,11 @@ PGObject::Util::PseudoCSV - The great new PGObject::Util::PseudoCSV!
 
 =head1 VERSION
 
-Version 0.01
+Version 1.0.0
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '1.0.0';
 
 
 =head1 SYNOPSIS
@@ -77,7 +77,7 @@ so depth in SQL structures passed should be reasonably limited.
 
 use parent 'Exporter';
 
-our @EXPORT = qw(pseudocsv_to_hash pseudocsv_parse);
+our @EXPORT = qw(pseudocsv_to_hash pseudocsv_parse to_pseudocsv);
 
 =head1 SUBROUTINES/METHODS
 
@@ -162,7 +162,10 @@ sub to_pseudocsv {
     my $csv = "";
     for my $item (@$list){
         $csv .= ',' if $csv;
-        $csv .= 'NULL' && next unless defined $item;
+        if (not defined $item){
+               $csv .= 'NULL';
+               next;
+        }
         if (ref $item eq ref []){
              my $val = to_pseudocsv($item, 0);
              $val = qq{"$val"} if $is_tuple;
@@ -171,6 +174,7 @@ sub to_pseudocsv {
         }
         $item =~ s/"/""/;
         $item = qq{"$item"} if $item =~ /(^null$|[",{}])/;
+        $csv .= $item;
     }
     return qq|($csv)| if $is_tuple;
     return qq|{$csv}|;
