@@ -1,4 +1,4 @@
-use Test::More tests => 14;
+use Test::More tests => 18;
 
 use PGObject::Util::PseudoCSV;
 
@@ -48,5 +48,22 @@ ok ($valarray = pseudocsv_parse($nestedtuple, 'test'),
 is_deeply($valarray, ['a', 'b', ',', '(1,a)'], 'Parse correct, simple array');
 
 # Tuple with array
+ok ($valarray = pseudocsv_parse($tuplewitharray, 'test'),
+      'Parse success, tuple with array member');
+is_deeply($valarray, ['a', 'b', ',', [1, 'a']], 'Parse correct, tuple with array');
 
 # Array of tuples
+ok ($valarray = pseudocsv_parse($arrayoftuples, 'test'),
+      'Parse success, tuple with array of tuples');
+is_deeply($valarray, ['(a,b)','(1,a)'], 'Parse correct, array of tuples');
+
+# New line tuple
+ok ($valarray = pseudocsv_parse($newlinetuple, 'test'),
+      'Parse success, tuple with array of tuples');
+is_deeply($valarray, ['a', 'b', ",\n"], 'Parse correct, array of tuples');
+
+# New line array
+ok ($valarray = pseudocsv_parse($newlinearray, 'test'),
+      'Parse success, tuple with array of tuples');
+is_deeply($valarray, ['a', 'b', ",\n"], 'Parse correct, array of tuples');
+

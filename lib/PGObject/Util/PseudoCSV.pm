@@ -92,9 +92,9 @@ subarray is parsed for more entities.
 sub pseudocsv_parse {
     my ($csv, $type, $registry) = @_;
     if ($csv =~ /^\(/ ) { # tuple
-       $csv =~ s/^\((.*)\)$/$1/g;
+       $csv =~ s/^\((.*)\)$/$1/s;
     } elsif ($csv =~ /^\{/ ) { # array 
-       $csv =~ s/^\{(.*)\}$/$1/g;
+       $csv =~ s/^\{(.*)\}$/$1/s;
     }
     $registry ||= 'default';
     my @returnlist = ();
@@ -115,11 +115,11 @@ sub _parse {
     my ($csvref) = @_;
     my $retval;
     if ($$csvref =~ /^"/){ # quoted string
-       $$csvref =~ s/^"(([^"]|"")*)",?//;
+       $$csvref =~ s/^"(([^"]|"")*)",?//s;
        $retval = $1;
        $retval =~ s/""/"/g;
     } else {
-       $$csvref =~ s/^([^,]*)(,|$)//;
+       $$csvref =~ s/^([^,]*)(,|$)//s;
        $retval = $1;
        $retval = undef if $retval =~ /^null$/i;
     }
