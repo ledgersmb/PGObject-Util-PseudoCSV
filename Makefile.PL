@@ -13,6 +13,7 @@ WriteMakefile(
       : ()),
     PL_FILES            => {},
     PREREQ_PM => {
+	'PGObject'   => 0,
     },
     BUILD_REQUIRES => {
         'Test::More' => 0,

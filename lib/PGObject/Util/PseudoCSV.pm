@@ -12,11 +12,11 @@ PGObject::Util::PseudoCSV - The great new PGObject::Util::PseudoCSV!
 
 =head1 VERSION
 
-Version 1.0.0
+Version 1.0.1
 
 =cut
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 
 =head1 SYNOPSIS
@@ -87,6 +87,8 @@ This does a one-level deep parse of the pseudo-csv, with additional levels in
 arrays.  When a tuple is encountered it is instantiated as its type but a 
 subarray is parsed for more entities.
 
+Only one pseudocsv record can be passed in at once, but embedded newlines are properly handled.
+
 =cut
 
 sub pseudocsv_parse {
@@ -134,7 +136,7 @@ sub _parse {
 =head2 pseudocsv_tohash($coldata, $colnames)
 
 Takes an arrayref of column data and an arrayref of column names and returns 
-a hash.
+a hash.  This is mostly a helper function designed to help with tuple types.
 
 =cut
 
@@ -153,6 +155,11 @@ sub pseudocsv_tohash {
 =head2 to_pseudocsv($datalist, $is_tuple)
 
 Takes a list of data and an is_tuple argument and creates a pseudocsv.
+
+Note:  this does not check for array sanity.  If you are not careful you can
+get arrays returned which are not valid SQL arrays.  Remember that SQL arrays
+have every item being the same size, and all SQL arrays are are regular in 
+size (so all 1 and 2d arrays follow the same form as mathematical matrices).
 
 =cut
 
