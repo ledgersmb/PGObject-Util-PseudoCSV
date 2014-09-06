@@ -13,11 +13,21 @@ WriteMakefile(
       : ()),
     PL_FILES            => {},
     PREREQ_PM => {
-	'PGObject'   => 0,
+	'PGObject'   => 1.400001,
     },
     BUILD_REQUIRES => {
         'Test::More' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'PGObject-Util-PseudoCSV-*' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+         resources => {
+             repository => {
+                 type => 'git',
+                 url  => 'https://github.com/ledgersmb/PGObject-Util-PseudoCSV.git',
+                 web  => 'https://github.com/ledgersmb/PGObject-Util-PseudoCSV',
+             },
+         },
+    },
 );

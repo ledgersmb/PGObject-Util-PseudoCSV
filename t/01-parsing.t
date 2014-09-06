@@ -1,4 +1,4 @@
-use Test::More tests => 18;
+use Test::More tests => 20;
 
 use PGObject::Util::PseudoCSV;
 
@@ -21,6 +21,7 @@ my $newlinetuple = qq|(a,b,",\n")|;
 my $newlinearray = qq|{a,b,",\n"}|;
 
 my $valarray;
+my $hashref;
 
 # Simple tuple tests to array
 ok ($valarray = pseudocsv_parse($simpletuple, 'test'), 
@@ -36,6 +37,11 @@ is_deeply($valarray, ['a', 'b', ','], 'Parse correct, simple array');
 ok ($valarray = pseudocsv_parse($nulltuple, 'test'), 
       'Parse success, simple tuple');
 is_deeply($valarray, ['a', 'b', ',', undef], 'Parse correct, simple tuple');
+
+ok($hashref = pcsv2hash($nulltuple, 'a', 'b', 'c', 'd'), 'parsed null tuple to hashref');
+
+is_deeply($hashref, {a => 'a', b => 'b', c => ',', d => undef }, 
+      'hashref correct from null tuple');
 
 # Null array
 ok ($valarray = pseudocsv_parse($nullarray, 'test'), 
