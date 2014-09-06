@@ -1,6 +1,6 @@
 package PGObject::Util::PseudoCSV;
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use PGObject;
@@ -12,11 +12,11 @@ PGObject::Util::PseudoCSV - Tuple/Array parsing and serialization for PGObject
 
 =head1 VERSION
 
-Version 1.0.3
+Version 1.1.0
 
 =cut
 
-our $VERSION = '1.0.3';
+our $VERSION = '1.1.0';
 
 
 =head1 SYNOPSIS
@@ -77,7 +77,8 @@ so depth in SQL structures passed should be reasonably limited.
 
 use parent 'Exporter';
 
-our @EXPORT = qw(pseudocsv_to_hash pseudocsv_parse to_pseudocsv);
+our @EXPORT = qw(pseudocsv_to_hash pseudocsv_parse to_pseudocsv 
+                 hash2pcsv pcsv2hash);
 
 =head1 SUBROUTINES/METHODS
 
@@ -111,6 +112,36 @@ sub pseudocsv_parse {
     return \@returnlist;
 }
 
+=head2 pcsv2hash($literal_string, @cols);
+
+Returns a hash from a tuple literal or array literal.  
+
+=cut
+
+sub pcsv2hash {
+    my $string = shift;
+    $string = shift if $string eq __PACKAGE__;
+    my @colnames = @_;
+
+    my @colvals = pseudocsv_parse($string, undef, undef);
+    
+    my $hash = { map{ $_ => shift @colvals } @colnames };
+    return %$hash if wantarray;
+    return $hash;
+}
+
+=head2 hash2pcsv($hashref, @cols)
+
+Takes an ordered list of columns and a hashref and returns a tuple literal
+
+=cut
+
+sub hash2pcsv {
+    my $hashref = shift;
+    return to_pseudocsv([map { $hashref->{$_} } @_], 1)
+}
+
+
 # _parse is the private method which does the hard work of parsing.
 
 sub _parse {
@@ -133,21 +164,18 @@ sub _parse {
     return $retval;
 }
 
-=head2 pseudocsv_tohash($coldata, $colnames)
+=head2 pseudocsv_tohash($coldata, $colnames) DEPRECATED
 
 Takes an arrayref of column data and an arrayref of column names and returns 
 a hash.  This is mostly a helper function designed to help with tuple types.
+
+This interface is deprecated and will go away in 2.0.  Use pcsv2hash instead.
 
 =cut
 
 sub pseudocsv_tohash {
     my ($cols, $colnames) = @_;
-    my $hash = {};
-    for my $col (@$cols) {
-        my $colname = shift @$colnames;
-        last unless defined $colname;
-        $hash->{$colname} = $col;
-    }
+    my $hash = { map{ $_ => shift @$cols } @$colnames };
     return %$hash if wantarray;
     return $hash;
 }
@@ -163,27 +191,24 @@ size (so all 1 and 2d arrays follow the same form as mathematical matrices).
 
 =cut
 
+sub _val {
+    my ($val, $is_tuple) = @_;
+    return 'NULL' unless defined $val;
+
+    $val = $val->to_db if eval { $val->can('to_db') };
+    $val = to_pseudocsv($_, 0) if ref $_ eq ref [];
+    return $val if ref $_ eq ref [] and !$is_tuple;
+
+    $val =~ s/"/""/;
+    $val = qq("$val") if $val =~ /(^null$|[",{}])/i;
+    return $val;
+}
+
 sub to_pseudocsv {
     my ($list, $is_tuple) = @_;
     Carp::croak 'First arg must be an arrayref' unless ref $list;
-    my $csv = "";
-    for my $item (@$list){
-        $csv .= ',' if $csv;
-        if (not defined $item){
-               $csv .= 'NULL';
-               next;
-        }
-        if (ref $item eq ref []){
-             my $val = to_pseudocsv($item, 0);
-             $val = qq{"$val"} if $is_tuple;
-             $csv .= $val;
-             next;
-        }
-        $item =~ s/"/""/;
-        $item = qq{"$item"} if $item =~ /(^null$|[",{}])/;
-        $csv .= $item;
-    }
-    return qq|($csv)| if $is_tuple;
+    my $csv =  join(',', map { _val($_, $is_tuple) } @$list);
+    return qq|($csv)| if $is_tuple;	
     return qq|{$csv}|;
 }
 
