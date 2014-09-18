@@ -12,11 +12,11 @@ PGObject::Util::PseudoCSV - Tuple/Array parsing and serialization for PGObject
 
 =head1 VERSION
 
-Version 1.1.0
+Version 1.1.1
 
 =cut
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.1.1';
 
 
 =head1 SYNOPSIS
