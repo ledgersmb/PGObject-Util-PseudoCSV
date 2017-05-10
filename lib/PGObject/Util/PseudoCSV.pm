@@ -261,7 +261,7 @@ L<http://search.cpan.org/dist/PGObject-Util-PseudoCSV/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014 Chris Travers.
+Copyright 2014-2017 Chris Travers.
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
