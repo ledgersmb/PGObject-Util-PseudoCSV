@@ -39,6 +39,7 @@
 ^tmp
 \bTAGS$
 ^MYMETA.yml$
+^MYMETA.json$
 
 \bSu-[\d\.\_]+
 
