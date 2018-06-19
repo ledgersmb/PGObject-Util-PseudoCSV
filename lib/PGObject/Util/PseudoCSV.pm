@@ -60,7 +60,7 @@ As of 2.0, we no longer automatically call deserialization functions from the
 parser itself.  At his point the calling classes MUST call the deserializer
 themselves but this is far easier since this has been moved to a separate
 service in PGObject 2.0.  This avoids an unecessary dependency on PGObject
-and ensures that the module is more geneally useful.
+and ensures that the module is more generally useful.
 
 =head1 EXPORT
 
