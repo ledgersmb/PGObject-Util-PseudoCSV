@@ -12,9 +12,6 @@ WriteMakefile(
       ? ('LICENSE'=> 'bsd')
       : ()),
     PL_FILES            => {},
-    PREREQ_PM => {
-	'PGObject'   => 1.400001,
-    },
     BUILD_REQUIRES => {
         'Test::More' => 0,
     },
